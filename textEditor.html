@@ -1,153 +1,250 @@
+
 <html>
     <head>
         <title>Text</title>
-        <link rel="stylesheet" type="text/css" href="css/style.css" />
-        <script src="script.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/textEditor.css" />
+        <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+	    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+        <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-auth.js"></script>
+	    <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-firestore.js"></script>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"> 
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     </head>
-    <body onLoad="iFrameOn();" class="body">
+    <body onLoad="iFrameOn();fillField();" class="body">
         <!--<p>Entry Title: <input name="title" id="title" type="text" size="80" maxlength="80" /></p> -->
-        <div id="main" class="container-fluid">
-            <div class="row">
-                <div id="undoButtons" class="col-2 justify-content-center"> 
-                        <div class="row" id="scribbleTitle">
-                            <div class="col">Clipboard</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-6">
-                                <input class="buttons" type="image" onClick="iUndo()" value="undo" src="images/undo-button.png" style="height:40px">
-                            </div>
-                            <div class="col-6">
-                                <input class="buttons" type="image" onClick="iRedo()" value="Redo" src="images/redo-button.png" style="height:40px">
-                            </div>
-                        </div> 
-                        <div class="row">
-                            <div class="col-sm">
-                                <input class="buttons" type="image" onClick="iCut()" value="Cut" src="images/Editing-Cut.png" style="height:30px">
-                            </div>
-                            <div class="col-sm">
-                                <input class="buttons" type="image" onClick="iCopy()" value="Copy" src="images/paste.png" style="height:30px">
-                            </div>
-                            <div class="col-sm">
-                                <input class="buttons" type="image" onClick="iPaste()" value="Paste" src="images/copy.jpg" style="height:30px" disabled>
-                            </div>
-                        </div>
+        <div id="position">
+            <div style="width:100%; background-color:#eceaef; border-bottom: 1px solid black">
+                <div class='row' id="saveBar">
+                    <div class="col"><a href="home.html" style="text-decoration:none; color:white;">Home</a></div>
+                    <div class="col"><button type="button" data-toggle="modal" data-target="#exampleModal" id="uploadButton" style="color:white;  background-color: Transparent;border:none;
+                        cursor: pointer;">Save</button></div>
+                    <div class="col"> <input type="button" onclick="downloadURI()" style="color:white;  background-color: Transparent;border:none;
+                        cursor: pointer;" value="Download"></div>
+                    <div class="col"> <input type="button" onclick="newFile()" style="color:white;  background-color: Transparent;border:none;
+                        cursor: pointer;" value="New">
                     </div>
-                    <div id="boldButtons" class="col-2">
-                        <div class="row" id="scribbleTitle">
-                            <div class="col">Font</div>
-                        </div>
-                        <div class="row"> 
-                            <div class="col-8">
-                                <select name="font" id="fontF" style="width:100%; padding-right:5px;" onClick="iFont()">
-                                    <!--<option value ="" disabled selected>Font</option> -->
-                                    <option value="Arial">Arial</option>
-                                    <option value="Times">Times</option>
-                                    <option value="Calibri">Calibri</option>
-                                </select>
+                </div>
+            </div>
+            <div id="main" class="container-fluid">
+                <div class="row">
+                    <div id="undoButtons" class="col-2 justify-content-center"> 
+                            <div class="row" id="scribbleTitle">
+                                <div class="col">Clipboard</div>
                             </div>
-                            <div class="col-4">
+                            <div class="row">
+                                <div class="col-6">
+                                    <input class="buttons" type="image" onClick="iUndo()" value="undo" src="images/undo-button.png" style="height:40px; float:right" title="Undo">
+                                </div>
+                                <div class="col-5">
+                                    <input class="buttons" type="image" onClick="iRedo()" value="Redo" src="images/redo-button.png" style="height:40px" title="Redo">
+                                </div>
+                            </div> 
+                            <div class="row">
+                                <div class="col-sm">
+                                    <input class="buttons" type="image" onClick="iCut()" value="Cut" src="images/Editing-Cut.png" style="height:30px" title="Cut">
+                                </div>
+                                <div class="col-sm">
+                                    <input class="buttons" type="image" onClick="iCopy()" value="Copy" src="images/paste.png" style="height:30px" title="Copy">
+                                </div>
+                                <div class="col-sm">
+                                    <input class="buttons" type="image" onClick="iPaste()" value="Paste" src="images/copy.jpg" style="height:30px" title="Paste" disabled >
+                                </div>
+                            </div>
+                        </div>
+                        <div id="boldButtons" class="col-2">
+                            <div class="row" id="scribbleTitle">
+                                <div class="col">Font</div>
+                            </div>
+                            <div class="row"> 
+                                <div class="col-8">
+                                    <select name="font" id="fontF" style="width:100%; padding-right:5px;" onClick="iFont()">
+                                        <!--<option value ="" disabled selected>Font</option> -->
+                                        <option value="Arial">Arial</option>
+                                        <option value="Times">Times</option>
+                                        <option value="Calibri">Calibri</option>
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <div class="row">
+                                        <div class="col">
+                                            <select name="fontSize" id="fSize" onClick="iFontSize()">
+                                                <option value ="" disabled selected>A</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row"> 
+                                <div class="col-1"> 
+                                    <input type="button" class="buttonsFont" onClick="iBold()" value="B" style="font-weight: bold;" title="Bold"> 
+                                </div>
+                                <div class="col-1"> 
+                                    <input type="button" class="buttonsFont" onClick="iItalic()" value="I" style="font-style: italic;" title="Italics">       
+                                </div>
+                                <div class="col-1"> 
+                                    <input type="button" class="buttonsFont" onClick="iUnderline()" value="U" style="text-decoration: underline;" title="Underline">
+                                </div>
+                                <div class="col-6" style="padding-top:5px; padding-right:5px;">
+                                    <select name="ColorDrop" id="Color" onClick="iForeColor()">
+                                        <option value ="" disabled selected>Color</option>
+                                        <option value="red" style="background-color:red"></option>
+                                        <option value="blue" style="background-color:blue"></option>
+                                        <option value="green" style="background-color:green"></option>
+                                        <option value="pink" style="background-color:pink"></option>
+                                        <option value="black" style="background-color:black"></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-8">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="row">
+                                        <div class="col" id="scribbleTitle">Paragraph</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-3" style="float:left">
+                                <div class="row">
+                                    <div class="col" id="indentButtons">
+                                        <div class="row">
+                                            <div class="col">
+                                                <input class="buttons" type="image" onClick="iOutdent()"  src="images/outdent.png"  value="Outdent" style="height:40px" title="Outdent">
+                                            </div>
+                                            <div class="col">
+                                                <input class="buttons" type="image" onClick="iIndent()" src="images/indent.png"  value="Indent" style="height:40px" title="Indent">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                <input type="image" onClick="iLeft()" src="images/left.png"  value="Left" style="height:20px" title="Align Left"> 
+                                            </div>
+                                            <div class="col">
+                                                <input type="image" onClick="iCenter()" src="images/center.png"  value="Center" style="height:20px" title="Align Center">
+                                            </div>
+                                            <div class="col">
+                                                <input type="image" onClick="iRight()" src="images/right.png" value="Right" style="height:20px" title="Align Right">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> 
+                            </div>
+                            <div class="col-4" style="float:left" id="indentButtons">
                                 <div class="row">
                                     <div class="col">
-                                        <select name="fontSize" id="fSize" onClick="iFontSize()">
-                                            <option value ="" disabled selected>A</option>
-                                            <option value="1">1</option>
-                                            <option value="2">2</option>
-                                            <option value="3">3</option>
-                                            <option value="4">4</option>
-                                            <option value="5">5</option>
-                                            <option value="6">6</option>
-                                            <option value="7">7</option>
-                                        </select>
+                                        <div class="row">
+                                            <div class="col-2">
+                                                <input type="image" onClick="iUnorderedList()" value="UL" src="images/ul.png" style="height:25px; padding-top:5px;" title="Unordered List">
+                                            </div>
+                                            <div class="col-2">
+                                                <input type="image" onClick="iOrderedList()" value="OL" src="images/ol.png" style="height:30px;" title="Ordered List">
+                                            </div>
+                                            <div class="col-2">
+                                                <input type="image" onClick="iHorizontalRule()" value="HR" src="images/hr.png" style="height:30px;" title="Horizontal Rule">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-2">
+                                                <input type="image" onClick="iUnLink()" value="UnLink" src="images/unlink.png" style="height:30px; padding-top:5px;" title="Unlink">
+                                            </div>
+                                            <div class="col-2">
+                                                <input type="image" onClick="iLink()" value="Link" src="images/link.png" style="height:32px; padding-top:5px;" title="Link">
+                                            </div>
+                                            <div class="col-8" style="padding-top:5px;">
+                                                <input type="text" name="link" id="linkBox" style="width:95%;padding-left:3px;" placeholder="www.example.com">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>  
+                            </div>
+                            <div class="col-5" style="float:left">
+                                <div class="col-8" style="float:left;">
+                                    <div class="row" style="height:40px;">
+                                        <div class="col-12">
+                                            <div class="row">
+                                                <div class="col" style="text-align:center;font-size:1.3em;">
+                                                    <input type="button" class="buttons" onClick="iImage()" value="Add Image" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <input type="image" value="Image" onclick="changeImage()" src="images/imageButton.png" style="height:25px; width:25px;" title="Display Image">
+                                        </div>
+                                        <div class="col-8"style="padding-left:.5px; padding-right:.5px;">
+                                            <input type="text" name="link" id="imageBox" style="width:100%;height:25px;padding-right:-10px;" placeholder="image URL">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4" style="float:left;">
+                                    <div class="row">
+                                        <div class="col">
+                                            <img src="images/flower.jpeg" alt="" height="70px" width="90px" id="imagePlace"  style="border: 2px solid black" onerror="javascript:this.src='images/flower.jpeg'">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row"> 
-                            <div class="col-1"> 
-                                <input type="button" class="buttonsFont" onClick="iBold()" value="B" style="font-weight: bold;"> 
-                            </div>
-                            <div class="col-1"> 
-                                <input type="button" class="buttonsFont" onClick="iItalic()" value="I" style="font-style: italic;">       
-                            </div>
-                            <div class="col-1"> 
-                                <input type="button" class="buttonsFont" onClick="iUnderline()" value="U" style="text-decoration: underline;">
-                            </div>
-                            <div class="col-6" style="padding-top:5px; padding-right:5px;">
-                                <select name="ColorDrop" id="Color" onClick="iForeColor()">
-                                    <option value ="" disabled selected>Color</option>
-                                    <option value="red" style="background-color:red"></option>
-                                    <option value="blue" style="background-color:blue"></option>
-                                    <option value="green" style="background-color:green"></option>
-                                    <option value="pink" style="background-color:pink"></option>
-                                    <option value="black" style="background-color:black"></option>
-                                </select>
-                                </div>
-                        </div>
                     </div>
-                    <div class="col-8">
-                        <!--<div class="row justify-content-center">
-                            <div id="scribbleTitle">
-                                <h2>Scribble</h2>
+
+                </div>
+            </div>
+            <div id="filler">
+                <img src="" id="fillerImage" height="40px" width="40px" />
+            </div>
+            <p></p>
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                            <div class="form-group">
+                                <label for="ClassName">Class Name</label>
+                                <input type="text" class="form-control" id="className" aria-describedby="emailHelp" placeholder="Math, Chem etc." required>
                             </div>
-                        </div> -->
-                        <div class="row" id="scribbleTitle">
-                            <div class="col">Paragraph</div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <input class="buttons" type="button" onClick="iIndent()" value="Indent">
+                            <div class="form-group">
+                                <label for="ClassNumber">Class Number</label>
+                                <input type="text" class="form-control" id="classNumber" placeholder="100, 101, etc." required>
                             </div>
-                            <!--<input type="button" onClick="iForeColor()" value="Text Color"> -->
-                            <div class="col">
-                                <input class="buttons" type="button" onClick="iOutdent()" value="Outdent">
+                            <div class="form-group">
+                                <label for="FileName">File Name</label>
+                                <div></div>
+                                <input type="text" class="form-control" id="fileName" style="width:80%; float:left;" placeholder="File Name" required> <span style="color:grey;float:left;padding-left:10px;padding-top:15px;">.doc</span>
                             </div>
-                            <div class="col">
-                                <input type="button" onClick="iLeft()" value="Left"> 
-                            </div>
-                            <div class="col">
-                                <input type="button" onClick="iCenter()" value="Center">
-                            </div>
-                            <div class="col">
-                                <input type="button" onClick="iRight()" value="Right">
-                            </div>
-                            <div class="col">
-                                <input type="button" onClick="iHorizontalRule()" value="HR">
-                            </div>
-                            <div class="col">
-                                <input type="button" onClick="iUnorderedList()" value="UL">
-                            </div>
-                            <div class="col">
-                                <input type="button" onClick="iOrderedList()" value="OL">
-                            </div>
-                            <div class="col">
-                                <input type="button" onClick="iLink()" value="Link">
-                            </div>
-                            <div class="col">
-                                <input type="button" onClick="iUnLink()" value="UnLink">
-                            </div>
-                            <div class="col">
-                                <input type="button" onClick="iImage()" value="Image" disabled>
-                            </div>
-                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" id="saveButton" class="btn btn-primary" data-dismiss="modal">Save changes</button>
+                    </div>       
                     </div>
                 </div>
-
             </div>
-            <div id="filler"></div>
-            <p></p>
             
         <div class="row justify-content-center" id="textBox">
-            <!-- Hide(but keep)your normal textarea and place in the iFrame replacement for it 
-            <textarea style="display:none;" name="myTextArea" id="myTextArea" cols="100" rows="14"></textarea> -->
+            <!-- Hide(but keep)your normal textarea and place in the iFrame replacement for it -->
             <textarea style="display:none;" name="myTextArea" id="myTextArea" style="width:800px; height:800px;"></textarea>
             <iframe  name="Scribble_Box" id="Scribble_Box" style="width:800px; height:800px; border: none;"></iframe>
-            <!-- End replacing your normal textarea -->
+            <!--End replacing your normal textarea -->
         </div>
-        </p>
-            <!--<br /><br /><input name="myBtn" type="button" value="Submit Data" onClick="javascript:submit_form();"/> -->
+        <p></p>
+        <script src="scripts/config.js"></script>
+        <script src="scripts/checkLogin.js"></script>
+        <script src="scripts/script.js"></script>
     </body>
 </html>

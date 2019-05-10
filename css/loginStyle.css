@@ -1,0 +1,36 @@
+#body{
+    background-color: #535760;
+}
+
+#signUP{
+    margin:auto;
+    float:right;
+    margin-right:5%;
+    height:550px;
+    margin-top: 40px;
+    width: 40%;
+    background-color: white;
+    border-radius: 25px;
+}
+#scribelName{
+    font-size: 1em;
+    text-align: center;
+    width: 100%;
+    font-family: "Curlz MT"; 
+}
+#loginTitle{
+    text-align: left;
+    font-size: 1.5em;
+}
+#logIn{
+    margin:auto;
+    float:left;
+    height:320px;
+    margin-top: 40px;
+    width: 40%;
+    background-color: white;
+    margin-left:5%;
+    border-radius: 25px;
+}
+
+
